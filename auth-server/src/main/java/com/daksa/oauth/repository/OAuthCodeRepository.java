@@ -8,11 +8,11 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 @Dependent
-public class OAuthAuthorizationRepository extends JpaRepository<OAuthCode, String> {
+public class OAuthCodeRepository extends JpaRepository<OAuthCode, String> {
 	@Inject
 	private EntityManager entityManager;
 
-	public OAuthAuthorizationRepository() {
+	public OAuthCodeRepository() {
 		super(OAuthCode.class);
 	}
 
