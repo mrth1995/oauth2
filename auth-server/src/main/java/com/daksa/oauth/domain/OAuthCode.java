@@ -6,8 +6,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "oauth_authorization")
-public class OAuthAuthorization implements Serializable {
+@Table(name = "oauth_code")
+public class OAuthCode implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -21,8 +21,10 @@ public class OAuthAuthorization implements Serializable {
 	private String codeChallenge;
 	@Column(name = "code_challenge_method", nullable = false)
 	private String codeChallengeMethod;
+	@Column(name = "code", nullable = false)
+	private String code;
 
-	public OAuthAuthorization() {
+	public OAuthCode() {
 		this.id = IDGen.generate();
 	}
 
@@ -46,11 +48,16 @@ public class OAuthAuthorization implements Serializable {
 		return codeChallengeMethod;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
 	public static final class Builder {
 		private String redirectUri;
 		private String clientId;
 		private String codeChallenge;
 		private String codeChallengeMethod;
+		private String code;
 
 		public Builder() {
 		}
@@ -75,13 +82,19 @@ public class OAuthAuthorization implements Serializable {
 			return this;
 		}
 
-		public OAuthAuthorization build() {
-			OAuthAuthorization oAuthAuthorization = new OAuthAuthorization();
-			oAuthAuthorization.codeChallengeMethod = this.codeChallengeMethod;
-			oAuthAuthorization.clientId = this.clientId;
-			oAuthAuthorization.redirectUri = this.redirectUri;
-			oAuthAuthorization.codeChallenge = this.codeChallenge;
-			return oAuthAuthorization;
+		public Builder code(String code) {
+			this.code = code;
+			return this;
+		}
+
+		public OAuthCode build() {
+			OAuthCode oAuthCode = new OAuthCode();
+			oAuthCode.codeChallengeMethod = this.codeChallengeMethod;
+			oAuthCode.clientId = this.clientId;
+			oAuthCode.redirectUri = this.redirectUri;
+			oAuthCode.codeChallenge = this.codeChallenge;
+			oAuthCode.code = this.code;
+			return oAuthCode;
 		}
 	}
 }

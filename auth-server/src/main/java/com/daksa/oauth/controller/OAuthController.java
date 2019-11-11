@@ -2,7 +2,7 @@ package com.daksa.oauth.controller;
 
 import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.model.AuthorizeParam;
-import com.daksa.oauth.domain.OAuthAuthorization;
+import com.daksa.oauth.domain.OAuthCode;
 import com.daksa.oauth.service.OAuthService;
 import io.olivia.webutil.json.Json;
 import org.slf4j.Logger;
@@ -33,8 +33,8 @@ public class OAuthController {
 	                           @Context HttpServletRequest request,
 	                           @Context HttpServletResponse response) throws IOException {
 		LOG.info("authorize {}", Json.getWriter().withDefaultPrettyPrinter().writeValueAsString(authorizeParam));
-		OAuthAuthorization oAuthAuthorization = oAuthService.createAuthorization(authorizeParam);
-		if (oAuthAuthorization == null) {
+		OAuthCode oAuthCode = oAuthService.createAuthorization(authorizeParam);
+		if (oAuthCode == null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		String contextPath = request.getContextPath();
@@ -42,7 +42,7 @@ public class OAuthController {
 		if (!contextPath.endsWith("/")) {
 			pathBuilder.append("/");
 		}
-		pathBuilder.append(Constants.AUTH_PAGE).append("?authorizationId=").append(oAuthAuthorization.getId());
+		pathBuilder.append(Constants.AUTH_PAGE).append("?authorizationId=").append(oAuthCode.getId());
 		String redirect = pathBuilder.toString();
 		response.sendRedirect(redirect);
 		return Response.accepted().build();

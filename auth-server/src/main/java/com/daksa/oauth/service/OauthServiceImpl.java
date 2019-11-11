@@ -2,9 +2,10 @@ package com.daksa.oauth.service;
 
 import com.daksa.oauth.domain.OauthClient;
 import com.daksa.oauth.model.AuthorizeParam;
-import com.daksa.oauth.domain.OAuthAuthorization;
+import com.daksa.oauth.domain.OAuthCode;
 import com.daksa.oauth.repository.ClientRepository;
 import com.daksa.oauth.repository.OAuthAuthorizationRepository;
+import io.olivia.webutil.IDGen;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.Dependent;
@@ -24,13 +25,14 @@ public class OauthServiceImpl implements OAuthService {
 
 	@Override
 	@Transactional
-	public OAuthAuthorization createAuthorization(AuthorizeParam authorizeParam) {
+	public OAuthCode createAuthorization(AuthorizeParam authorizeParam) {
 		if (validateParam(authorizeParam)) {
-			OAuthAuthorization authorization = new OAuthAuthorization.Builder()
+			OAuthCode authorization = new OAuthCode.Builder()
 					.clientId(authorizeParam.getClientId())
 					.codeChallenge(authorizeParam.getCodeChallenge())
 					.codeChallengeMethod(authorizeParam.getCodeChallengeMethod())
 					.redirectUri(authorizeParam.getRedirectUri())
+					.code(IDGen.generate())
 					.build();
 			oAuthAuthorizationRepository.store(authorization);
 			return authorization;
@@ -43,7 +45,6 @@ public class OauthServiceImpl implements OAuthService {
 		return client != null && StringUtils.isNotEmpty(authorizeParam.getCodeChallenge())
 				&& StringUtils.isNotEmpty(authorizeParam.getResponseType())
 				&& StringUtils.isNotEmpty(authorizeParam.getCodeChallengeMethod())
-				&& StringUtils.isNotEmpty(authorizeParam.getRedirectUri())
 				&& authorizeParam.getResponseType().equals(AUTHORIZATION_CODE)
 				&& authorizeParam.getCodeChallengeMethod().equals(SHA256);
 	}
