@@ -17,6 +17,8 @@ public class OauthClient implements Serializable {
 	private String id;
 	@Column(length = 32, nullable = false)
 	private String name;
+	@Column(length = 32, nullable = false)
+	private String secret;
 
 	protected OauthClient() {
 	}
@@ -24,6 +26,10 @@ public class OauthClient implements Serializable {
 	public OauthClient(String id, String name) {
 		this.id = id;
 		this.name = name;
+	}
+
+	public String getSecret() {
+		return secret;
 	}
 
 	public String getId() {

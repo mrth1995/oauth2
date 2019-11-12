@@ -9,6 +9,9 @@ import java.util.Date;
 
 @Entity
 @Table(name = "oauth_code")
+@NamedQueries({
+		@NamedQuery(name = "OAuthCode.find", query = "SELECT a FROM OAuthCode a WHERE a.clientId = :clientId AND a.code = :code AND a.codeChallenge = :codeChallenge")
+})
 public class OAuthCode implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -21,8 +24,6 @@ public class OAuthCode implements Serializable {
 	private String clientId;
 	@Column(name = "code_challenge", nullable = false)
 	private String codeChallenge;
-	@Column(name = "code_challenge_method", nullable = false)
-	private String codeChallengeMethod;
 	@Column(name = "code", nullable = false)
 	private String code;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -59,16 +60,16 @@ public class OAuthCode implements Serializable {
 		return codeChallenge;
 	}
 
-	public String getCodeChallengeMethod() {
-		return codeChallengeMethod;
-	}
-
 	public String getCode() {
 		return code;
 	}
 
 	public boolean valid(Date now) {
 		return expiryTimestamp.after(now) && status.equals(CodeStatus.CREATED);
+	}
+
+	public void invalidate() {
+		this.status = CodeStatus.USED;
 	}
 
 	public void markAsUsed() {
@@ -128,7 +129,6 @@ public class OAuthCode implements Serializable {
 
 		public OAuthCode build() {
 			OAuthCode oAuthCode = new OAuthCode();
-			oAuthCode.codeChallengeMethod = this.codeChallengeMethod;
 			oAuthCode.clientId = this.clientId;
 			oAuthCode.redirectUri = this.redirectUri;
 			oAuthCode.codeChallenge = this.codeChallenge;

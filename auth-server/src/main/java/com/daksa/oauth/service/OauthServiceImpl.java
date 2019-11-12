@@ -21,8 +21,10 @@ public class OauthServiceImpl implements OAuthService {
 	private ClientRepository clientRepository;
 	@Inject
 	private OAuthCodeRepository oAuthCodeRepository;
+	@Inject
+	private AccessTokenService accessTokenService;
 
-	private static final String SHA256 = "S256";
+	private static final String SHA256 = "SHA256";
 	private static final String AUTHORIZATION_CODE = "code";
 
 	@Override
@@ -32,9 +34,8 @@ public class OauthServiceImpl implements OAuthService {
 			OAuthCode authorization = new OAuthCode.Builder()
 					.clientId(authorizeParam.getClientId())
 					.codeChallenge(authorizeParam.getCodeChallenge())
-					.codeChallengeMethod(authorizeParam.getCodeChallengeMethod())
 					.redirectUri(authorizeParam.getRedirectUri())
-					.code(IDGen.generate())
+					.code(accessTokenService.createAuthCode(authorizeParam.getClientId()))
 					.createdTimestamp(new Date(), Constants.CODE_EXPIRY_SECOND)
 					.build();
 			oAuthCodeRepository.store(authorization);
@@ -47,8 +48,6 @@ public class OauthServiceImpl implements OAuthService {
 		OauthClient client = clientRepository.find(authorizeParam.getClientId());
 		return client != null && StringUtils.isNotEmpty(authorizeParam.getCodeChallenge())
 				&& StringUtils.isNotEmpty(authorizeParam.getResponseType())
-				&& StringUtils.isNotEmpty(authorizeParam.getCodeChallengeMethod())
-				&& authorizeParam.getResponseType().equals(AUTHORIZATION_CODE)
-				&& authorizeParam.getCodeChallengeMethod().equals(SHA256);
+				&& authorizeParam.getResponseType().equals(AUTHORIZATION_CODE);
 	}
 }

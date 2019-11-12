@@ -17,8 +17,6 @@ public class AuthorizeParam {
 	private String responseType;
 	@QueryParam("code_challenge")
 	private String codeChallenge;
-	@QueryParam("code_challenge_method")
-	private String codeChallengeMethod;
 
 	public String getClientId() {
 		return clientId;
@@ -34,9 +32,5 @@ public class AuthorizeParam {
 
 	public String getCodeChallenge() {
 		return codeChallenge;
-	}
-
-	public String getCodeChallengeMethod() {
-		return codeChallengeMethod;
 	}
 }
