@@ -16,6 +16,24 @@ public class RequestAccessToken {
 	private String codeVerifier;
 	@FormParam("code_challenge_method")
 	private String codeChallengeMethod;
+	@FormParam("client_secret")
+	private String clientSecret;
+	@FormParam("grant_type")
+	private String grantType;
+	@FormParam("refresh_token")
+	private String refreshToken;
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public String getGrantType() {
+		return grantType;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
 
 	public String getClientId() {
 		return clientId;

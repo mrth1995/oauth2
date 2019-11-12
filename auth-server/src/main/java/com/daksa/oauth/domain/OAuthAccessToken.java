@@ -38,6 +38,10 @@ public class OAuthAccessToken implements Serializable {
 	@Column(name = "expiry_timestamp", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date expiryTimestamp;
+	@Column(name = "token_type")
+	private String tokenType;
+	@Column(name = "grant_type")
+	private String grantType;
 
 	public OAuthAccessToken() {
 		this.id = IDGen.generate();
@@ -72,6 +76,16 @@ public class OAuthAccessToken implements Serializable {
 			calendar.setTime(createdTimestamp);
 			calendar.add(Calendar.SECOND, expirySecond);
 			accessToken.expiryTimestamp = calendar.getTime();
+			return this;
+		}
+
+		public Builder grantType(String grantType) {
+			accessToken.grantType = grantType;
+			return this;
+		}
+
+		public Builder tokenType(String tokenType) {
+			accessToken.tokenType = tokenType;
 			return this;
 		}
 
@@ -110,5 +124,13 @@ public class OAuthAccessToken implements Serializable {
 
 	public Date getExpiryTimestamp() {
 		return expiryTimestamp;
+	}
+
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	public String getGrantType() {
+		return grantType;
 	}
 }

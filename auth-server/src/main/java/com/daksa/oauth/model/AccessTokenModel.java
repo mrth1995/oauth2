@@ -15,6 +15,24 @@ public class AccessTokenModel {
 	private String refreshToken;
 	@XmlJavaTypeAdapter(JsonTimestampAdapter.class)
 	private Date expiryTimestamp;
+	private String grantType;
+	private String tokenType;
+
+	public void setGrantType(String grantType) {
+		this.grantType = grantType;
+	}
+
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
+	}
+
+	public String getGrantType() {
+		return grantType;
+	}
+
+	public String getTokenType() {
+		return tokenType;
+	}
 
 	public String getAccessToken() {
 		return accessToken;
