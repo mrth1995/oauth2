@@ -6,7 +6,6 @@ import com.daksa.oauth.model.AuthorizeParam;
 import com.daksa.oauth.domain.OAuthCode;
 import com.daksa.oauth.repository.ClientRepository;
 import com.daksa.oauth.repository.OAuthCodeRepository;
-import io.olivia.webutil.IDGen;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.Dependent;
@@ -15,7 +14,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 
 @Dependent
-public class OauthServiceImpl implements OAuthService {
+public class AuthorizationCodeSrviceImpl implements AuthorizationCodeService {
 
 	@Inject
 	private ClientRepository clientRepository;
@@ -24,7 +23,6 @@ public class OauthServiceImpl implements OAuthService {
 	@Inject
 	private AccessTokenService accessTokenService;
 
-	private static final String SHA256 = "SHA256";
 	private static final String AUTHORIZATION_CODE = "code";
 
 	@Override

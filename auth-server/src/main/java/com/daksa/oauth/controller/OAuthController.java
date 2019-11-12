@@ -10,11 +10,8 @@ import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.model.AccessTokenModel;
 import com.daksa.oauth.model.AuthorizeParam;
 import com.daksa.oauth.model.RequestAccessToken;
-import com.daksa.oauth.repository.AccessTokenRepository;
-import com.daksa.oauth.repository.ClientRepository;
-import com.daksa.oauth.repository.OAuthCodeRepository;
 import com.daksa.oauth.service.AccessTokenService;
-import com.daksa.oauth.service.OAuthService;
+import com.daksa.oauth.service.AuthorizationCodeService;
 import io.olivia.webutil.json.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +35,7 @@ public class OAuthController {
 	private static final Logger LOG = LoggerFactory.getLogger(OAuthController.class);
 
 	@Inject
-	private OAuthService oAuthService;
+	private AuthorizationCodeService authorizationCodeService;
 	@Inject
 	private AccessTokenService accessTokenService;
 
@@ -47,7 +44,7 @@ public class OAuthController {
 	                           @Context HttpServletRequest request,
 	                           @Context HttpServletResponse response) throws IOException {
 		LOG.info("authorize {}", Json.getWriter().withDefaultPrettyPrinter().writeValueAsString(authorizeParam));
-		OAuthCode oAuthCode = oAuthService.createAuthorization(authorizeParam);
+		OAuthCode oAuthCode = authorizationCodeService.createAuthorization(authorizeParam);
 		if (oAuthCode == null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
@@ -68,13 +65,10 @@ public class OAuthController {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public AccessTokenModel accessTokenRequest(@BeanParam RequestAccessToken param) throws InvalidEncryptionMethodException,
 			InvalidAuthCodeException, InvalidGrantTypeException, AuthorizationException {
-		if (!param.getCodeChallengeMethod().equals("SHA256")) {
-			throw new InvalidEncryptionMethodException();
-		}
 		OAuthAccessToken accessToken;
 		if (param.getGrantType().equals(Constants.GRANT_TYPE_AUTH_CODE)) {
 			accessToken = accessTokenService.requestTokenAuthCode(param.getClientId(), param.getCode(),
-					param.getCodeVerifier());
+					param.getCodeVerifier(), param.getCodeChallengeMethod());
 		} else if (param.getGrantType().equals(Constants.GRANT_TYPE_CLIENT_CREDENTIAL)) {
 			accessToken = accessTokenService.requestTokenClientCredential(param.getClientId(), param.getClientSecret());
 		} else if (param.getGrantType().equals(Constants.GRANT_TYPE_REFRESH_TOKEN)) {

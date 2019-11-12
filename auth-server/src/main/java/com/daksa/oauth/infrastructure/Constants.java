@@ -8,4 +8,5 @@ public class Constants {
 	public static final String GRANT_TYPE_CLIENT_CREDENTIAL = "client_credentials";
 	public static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
 	public static String TOKEN_TYPE_BEARER = "Bearer";
+	public static String RESPONSE_CODE_HEADER = "RC";
 }

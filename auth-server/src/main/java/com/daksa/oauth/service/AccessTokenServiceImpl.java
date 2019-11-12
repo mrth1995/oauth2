@@ -5,6 +5,7 @@ import com.daksa.oauth.domain.OAuthCode;
 import com.daksa.oauth.domain.OauthClient;
 import com.daksa.oauth.exception.AuthorizationException;
 import com.daksa.oauth.exception.InvalidAuthCodeException;
+import com.daksa.oauth.exception.InvalidEncryptionMethodException;
 import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.repository.AccessTokenRepository;
 import com.daksa.oauth.repository.ClientRepository;
@@ -47,7 +48,10 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 	}
 
 	@Override
-	public OAuthAccessToken requestTokenAuthCode(String clientId, String code, String codeVerifier) throws InvalidAuthCodeException {
+	public OAuthAccessToken requestTokenAuthCode(String clientId, String code, String codeVerifier, String codeChallengeMethod) throws InvalidAuthCodeException, InvalidEncryptionMethodException {
+		if (!codeChallengeMethod.equals("SHA256")) {
+			throw new InvalidEncryptionMethodException();
+		}
 		OauthClient client = clientRepository.find(clientId);
 		String codeChallenge = HmacUtils.hmacSha256Hex(client.getSecret(), codeVerifier);
 		LOG.debug("code challenge: {}", codeChallenge);
@@ -97,5 +101,10 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 	@Override
 	public OAuthAccessToken requestTokenRefreshToken(String clientId, String clientSecret, String refreshToken) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getClientId(String accesToken) {
+		return null;
 	}
 }

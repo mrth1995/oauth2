@@ -41,7 +41,7 @@ public class OAuthCode implements Serializable {
 
 	public OAuthCode() {
 		this.id = IDGen.generate();
-		this.status = CodeStatus.CREATED;
+		this.status = CodeStatus.ACTIVE;
 	}
 
 	public String getId() {
@@ -65,15 +65,15 @@ public class OAuthCode implements Serializable {
 	}
 
 	public boolean valid(Date now) {
-		return expiryTimestamp.after(now) && status.equals(CodeStatus.CREATED);
+		return expiryTimestamp.after(now) && status.equals(CodeStatus.ACTIVE);
 	}
 
 	public void invalidate() {
-		this.status = CodeStatus.USED;
+		this.status = CodeStatus.INACTIVE;
 	}
 
 	public void markAsUsed() {
-		this.status = CodeStatus.USED;
+		this.status = CodeStatus.INACTIVE;
 	}
 
 	public static final class Builder {

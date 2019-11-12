@@ -1,5 +1,5 @@
 package com.daksa.oauth.domain;
 
-public enum CodeStatus {
+public enum AccountStatus {
 	ACTIVE, INACTIVE
 }
