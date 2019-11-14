@@ -3,6 +3,7 @@ package com.daksa.oauth.service;
 import com.daksa.oauth.domain.OAuthAccessToken;
 import com.daksa.oauth.domain.OAuthCode;
 import com.daksa.oauth.domain.OauthClient;
+import com.daksa.oauth.exception.AuthenticationException;
 import com.daksa.oauth.exception.AuthorizationException;
 import com.daksa.oauth.exception.InvalidAuthCodeException;
 import com.daksa.oauth.exception.InvalidEncryptionMethodException;
@@ -10,6 +11,7 @@ import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.repository.AccessTokenRepository;
 import com.daksa.oauth.repository.ClientRepository;
 import com.daksa.oauth.repository.OAuthCodeRepository;
+import io.olivia.webutil.DateTimeUtil;
 import io.olivia.webutil.IDGen;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -31,6 +33,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 	private OAuthCodeRepository oAuthCodeRepository;
 	@Inject
 	private AccessTokenRepository accessTokenRepository;
+	@Inject
+	private DateTimeUtil dateTimeUtil;
 
 	private String createAccessToken(String clientId) {
 		String uuid = IDGen.generate();
@@ -99,12 +103,29 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 	}
 
 	@Override
-	public OAuthAccessToken requestTokenRefreshToken(String clientId, String clientSecret, String refreshToken) {
-		throw new UnsupportedOperationException();
+	public OAuthAccessToken requestTokenRefreshToken(String clientId, String clientSecret, String refreshToken) throws AuthenticationException {
+		OauthClient client = clientRepository.find(clientId);
+		Date timestamp = dateTimeUtil.now();
+
+		// Verify parameters
+		if (!client.getSecret().equals(clientSecret)) {
+			throw new AuthenticationException("Wrong client_secret");
+		}
+		OAuthAccessToken oauthToken = accessTokenRepository.findByRefreshToken(refreshToken);
+		// Refresh access token
+		String accessToken = createAccessToken(clientId);
+
+		oauthToken.setAccessToken(accessToken);
+		oauthToken.setLastAccessTimestamp(timestamp);
+		oauthToken.refresh(timestamp, Constants.OAUTH_ACCESS_TOKEN_EXPIRES);
+		accessTokenRepository.update(oauthToken);
+		return oauthToken;
 	}
 
 	@Override
-	public String getClientId(String accesToken) {
-		return null;
+	public String getClientId(String accessToken) {
+		String accessTokenRaw = new String(Base64.getDecoder().decode(accessToken));
+		String[] parts = accessTokenRaw.split(":", 2);
+		return parts[0];
 	}
 }

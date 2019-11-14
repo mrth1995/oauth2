@@ -1,6 +1,7 @@
 package com.daksa.oauth.ui;
 
 import com.daksa.oauth.domain.OAuthCode;
+import com.daksa.oauth.exception.AccountNotExistException;
 import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.repository.OAuthCodeRepository;
 import com.daksa.oauth.service.UserAuthService;
@@ -8,6 +9,7 @@ import com.vaadin.cdi.annotation.RouteScoped;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.QueryParameters;
@@ -53,13 +55,17 @@ public class AuthorizePage extends Div implements BeforeEnterObserver {
 				loginForm.addLoginListener(loginEvent -> {
 					String username = loginEvent.getUsername();
 					String password = loginEvent.getPassword();
-					if (userAuthService.verifyPassword(username, password)) {
-						StringBuilder pathBuilder = new StringBuilder(StringUtils.isNotEmpty(authCode.getRedirectUri()) ? authCode.getRedirectUri() : Constants.SUCCESS_PAGE);
-						pathBuilder.append("?code=").append(authCode.getCode());
-						LOG.info("redirect to: {}", pathBuilder.toString());
-						UI.getCurrent().getPage().executeJs("window.location.href='" + pathBuilder.toString() + "'", "_self");
-					} else {
-						beforeEnterEvent.rerouteTo(HomePage.class);
+					try {
+						if (userAuthService.verifyPassword(username, password)) {
+							StringBuilder pathBuilder = new StringBuilder(StringUtils.isNotEmpty(authCode.getRedirectUri()) ? authCode.getRedirectUri() : Constants.SUCCESS_PAGE);
+							pathBuilder.append("?code=").append(authCode.getCode());
+							LOG.info("redirect to: {}", pathBuilder.toString());
+							UI.getCurrent().getPage().executeJs("window.location.href='" + pathBuilder.toString() + "'", "_self");
+						} else {
+							loginForm.setError(true);
+						}
+					} catch (AccountNotExistException e) {
+						loginForm.setError(true);
 					}
 				});
 				add(loginForm);

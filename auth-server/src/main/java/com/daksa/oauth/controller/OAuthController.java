@@ -2,10 +2,7 @@ package com.daksa.oauth.controller;
 
 import com.daksa.oauth.domain.OAuthAccessToken;
 import com.daksa.oauth.domain.OAuthCode;
-import com.daksa.oauth.exception.AuthorizationException;
-import com.daksa.oauth.exception.InvalidAuthCodeException;
-import com.daksa.oauth.exception.InvalidEncryptionMethodException;
-import com.daksa.oauth.exception.InvalidGrantTypeException;
+import com.daksa.oauth.exception.*;
 import com.daksa.oauth.infrastructure.Constants;
 import com.daksa.oauth.model.AccessTokenModel;
 import com.daksa.oauth.model.AuthorizeParam;
@@ -64,7 +61,7 @@ public class OAuthController {
 	@Transactional
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public AccessTokenModel accessTokenRequest(@BeanParam RequestAccessToken param) throws InvalidEncryptionMethodException,
-			InvalidAuthCodeException, InvalidGrantTypeException, AuthorizationException {
+			InvalidAuthCodeException, InvalidGrantTypeException, AuthorizationException, AuthenticationException {
 		OAuthAccessToken accessToken;
 		if (param.getGrantType().equals(Constants.GRANT_TYPE_AUTH_CODE)) {
 			accessToken = accessTokenService.requestTokenAuthCode(param.getClientId(), param.getCode(),

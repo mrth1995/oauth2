@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 @RequestScoped
-@WebFilter(urlPatterns = "/account/*", asyncSupported = true)
+@WebFilter(urlPatterns = "/rest/account", asyncSupported = true)
 public class OAuthFilter implements Filter {
 	private static final Logger LOG = LoggerFactory.getLogger(OAuthFilter.class);
 

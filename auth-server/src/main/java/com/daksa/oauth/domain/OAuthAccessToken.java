@@ -14,6 +14,10 @@ import java.util.Date;
 @Table(name = "access_token")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@NamedQueries({
+		@NamedQuery(name = "OAuthAccessToken.findByAccessToken", query = "SELECT a FROM OAuthAccessToken a WHERE a.accessToken = :accessToken"),
+		@NamedQuery(name = "OAuthAccessToken.findByRefreshToken", query = "SELECT a FROM OAuthAccessToken a WHERE a.refreshToken = :refreshToken")
+})
 public class OAuthAccessToken implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -132,5 +136,24 @@ public class OAuthAccessToken implements Serializable {
 
 	public String getGrantType() {
 		return grantType;
+	}
+
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	public void setLastAccessTimestamp(Date lastAccessTimestamp) {
+		this.lastAccessTimestamp = lastAccessTimestamp;
+	}
+
+	public void refresh(Date refreshTimestamp, int expirySeconds) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(refreshTimestamp);
+		calendar.add(Calendar.SECOND, expirySeconds);
+		this.expiryTimestamp = calendar.getTime();
 	}
 }
